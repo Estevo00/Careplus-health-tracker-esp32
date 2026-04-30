@@ -196,3 +196,10 @@ Mesmo sendo uma simulação, o sistema demonstra conceitos importantes como:
 
 🧪 Simulação do projeto no Wokwi:
 [Acessar projeto no Wokwi](https://wokwi.com/projects/462694220214405121)
+
+## 👥 Integrantes
+
+- Cauã Pereira da Silva — RM568143
+- Felipe Estevo Santos — RM567780
+- Igor Grave Teixeira — RM567663
+- Renan dos Reis Santos — RM568540
