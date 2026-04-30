@@ -1,0 +1,176 @@
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <PubSubClient.h>
+
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
+
+const char* mqttServer = "70cca3db7eef4ceba8aa878d5f61e00a.s1.eu.hivemq.cloud";
+const int mqttPort = 8883;
+
+const char* mqttUser = "fiap_user";
+const char* mqttPassword = "Fiap567780";
+
+const char* topic = "fiap/careplus/healthtracker";
+
+WiFiClientSecure espClient;
+PubSubClient client(espClient);
+
+const int pinoMovimento = 34;
+const int pinoSono = 35;
+const int botaoHidratacao = 18;
+
+const int ledVerde = 26;
+const int ledAmarelo = 27;
+const int ledVermelho = 25;
+const int buzzer = 17;
+
+int streak = 0;
+bool metaAnteriorAtingida = false;
+
+void conectarWiFi() {
+  Serial.print("Conectando ao WiFi");
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi conectado!");
+}
+
+void conectarMQTT() {
+  while (!client.connected()) {
+    Serial.print("Conectando ao HiveMQ Cloud...");
+
+    String clientId = "CarePlusHealthTracker-";
+    clientId += String(random(0xffff), HEX);
+
+    if (client.connect(clientId.c_str(), mqttUser, mqttPassword)) {
+      Serial.println("Conectado!");
+    } else {
+      Serial.print("Falha. Codigo: ");
+      Serial.println(client.state());
+      delay(3000);
+    }
+  }
+}
+
+void tocarRecompensa() {
+  tone(buzzer, 1200);
+  delay(150);
+  noTone(buzzer);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(botaoHidratacao, INPUT_PULLUP);
+
+  pinMode(ledVerde, OUTPUT);
+  pinMode(ledAmarelo, OUTPUT);
+  pinMode(ledVermelho, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+
+  conectarWiFi();
+
+  espClient.setInsecure();
+  client.setServer(mqttServer, mqttPort);
+}
+
+void loop() {
+  if (!client.connected()) {
+    conectarMQTT();
+  }
+
+  client.loop();
+
+  int leituraMovimento = analogRead(pinoMovimento);
+  int leituraSono = analogRead(pinoSono);
+
+  int movimento = map(leituraMovimento, 0, 4095, 0, 100);
+  int sono = map(leituraSono, 0, 4095, 0, 100);
+
+  bool metaMovimentoBatida = movimento >= 60;
+  bool metaSonoBatida = sono >= 70;
+  bool hidratacaoCheck = digitalRead(botaoHidratacao) == LOW;
+
+  int pontos = 0;
+
+  if (metaMovimentoBatida) {
+    pontos += 10;
+  }
+
+  if (metaSonoBatida) {
+    pontos += 10;
+  }
+
+  if (hidratacaoCheck) {
+    pontos += 5;
+  }
+
+  String status = "precisa_incentivo";
+
+  if (pontos >= 20) {
+    status = "meta_atingida";
+  } else if (pontos >= 10) {
+    status = "progresso_parcial";
+  }
+
+  if (status == "meta_atingida") {
+    digitalWrite(ledVerde, HIGH);
+    digitalWrite(ledAmarelo, LOW);
+    digitalWrite(ledVermelho, LOW);
+
+    if (metaAnteriorAtingida == false) {
+      streak++;
+      tocarRecompensa();
+      metaAnteriorAtingida = true;
+    }
+  } 
+  else if (status == "progresso_parcial") {
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledAmarelo, HIGH);
+    digitalWrite(ledVermelho, LOW);
+    metaAnteriorAtingida = false;
+  } 
+  else {
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledAmarelo, LOW);
+    digitalWrite(ledVermelho, HIGH);
+    metaAnteriorAtingida = false;
+  }
+
+  String payload = "{";
+  payload += "\"device\":\"careplus_health_tracker\",";
+  payload += "\"meta_movimento\":\"";
+  payload += metaMovimentoBatida ? "batida" : "nao_batida";
+  payload += "\",";
+  payload += "\"meta_sono\":\"";
+  payload += metaSonoBatida ? "batida" : "nao_batida";
+  payload += "\",";
+  payload += "\"hidratacao_check\":";
+  payload += hidratacaoCheck ? "batida" : "nao_batida";
+  payload += ",";
+  payload += "\"pontos\":";
+  payload += String(pontos);
+  payload += ",";
+  payload += "\"status\":\"";
+  payload += status;
+  payload += "\",";
+  payload += "\"streak\":";
+  payload += String(streak);
+  payload += ",";
+  payload += "\"timestamp\":";
+  payload += String(millis());
+  payload += "}";
+
+  Serial.println(payload);
+
+  client.publish(topic, payload.c_str());
+
+  delay(2000);
+}
