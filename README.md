@@ -166,46 +166,9 @@ ESP32 → MQTT → HiveMQ Cloud → Node-RED
 
 ---
 
-## 🎯 Objetivo do projeto
-
-Este projeto tem como objetivo demonstrar um sistema IoT funcional que representa um Health Tracker moderno, com foco em:
-
-- simplicidade de uso
-- baixo atrito para o usuário
-- coleta passiva de dados
-- feedback imediato
-- engajamento por gamificação
-
----
-
-## 📌 Considerações finais
-
-O protótipo foi desenvolvido com foco em representar uma solução realista de mercado, alinhada com tendências atuais de dispositivos vestíveis e saúde digital.
-
-Mesmo sendo uma simulação, o sistema demonstra conceitos importantes como:
-
-- comunicação em tempo real
-- processamento local (edge computing)
-- integração com serviços em nuvem
-- experiência do usuário baseada em feedback contínuo
-
-## 🎥 Demonstração do Projeto
-
-📺 Vídeo demonstrando o funcionamento completo do sistema:
-[Assista no YouTube](https://youtu.be/4JgOYw4e4tY?si=wmjduRjW2SbO0Q4w)
-
-🧪 Simulação do projeto no Wokwi:
-[Acessar projeto no Wokwi](https://wokwi.com/projects/462694220214405121)
-
 # CarePlus Health Tracker (ESP32 Físico)
 
 Este repositório contém a documentação técnica, códigos e scripts do ecossistema **Health Tracker** desenvolvido para a **Care Plus**. O projeto consiste em uma solução de Internet das Coisas (IoT) integrada de ponta a ponta, coletando dados críticos de bem-estar a partir de um dispositivo físico de borda e disponibilizando os dados em tempo real em um painel gerencial executivo.
-
----
-
-## 🎬 Demonstração do Projeto
-Assista à validação em runtime de todo o ecossistema integrado (Hardware Real, MQTT Cloud e Dashboard):
-👉 **[Assista no YouTube](https://youtu.be/rdVtUcSX1VU)**
 
 ---
 
@@ -238,6 +201,41 @@ O dispositivo físico de borda realiza as leituras estruturadas e envia periodic
   "hidratacao": 0,
   "pontos": 20
 }
+---
+
+## 🎯 Objetivo do projeto
+
+Este projeto tem como objetivo demonstrar um sistema IoT funcional que representa um Health Tracker moderno, com foco em:
+
+- simplicidade de uso
+- baixo atrito para o usuário
+- coleta passiva de dados
+- feedback imediato
+- engajamento por gamificação
+
+---
+
+## 📌 Considerações finais
+
+O protótipo foi desenvolvido com foco em representar uma solução realista de mercado, alinhada com tendências atuais de dispositivos vestíveis e saúde digital.
+
+Mesmo sendo uma simulação, o sistema demonstra conceitos importantes como:
+
+- comunicação em tempo real
+- processamento local (edge computing)
+- integração com serviços em nuvem
+- experiência do usuário baseada em feedback contínuo
+
+## 🎥 Demonstração do Projeto
+
+📺 Vídeo demonstrando o funcionamento completo do sistema:
+[Assista no YouTube](https://youtu.be/4JgOYw4e4tY?si=wmjduRjW2SbO0Q4w)
+
+📺 Assista à validação em runtime de todo o ecossistema integrado (Hardware Real, MQTT Cloud e Dashboard):
+[Assista no YouTube](https://youtu.be/rdVtUcSX1VU)
+
+🧪 Simulação do projeto no Wokwi:
+[Acessar projeto no Wokwi](https://wokwi.com/projects/462694220214405121)
 
 
 ## 👥 Integrantes
