@@ -226,6 +226,8 @@ Mesmo sendo uma simulação, o sistema demonstra conceitos importantes como:
 - processamento local (edge computing)
 - integração com serviços em nuvem
 - experiência do usuário baseada em feedback contínuo
+  
+---
 
 ## 🎥 Demonstração do Projeto
 
@@ -238,6 +240,7 @@ Mesmo sendo uma simulação, o sistema demonstra conceitos importantes como:
 🧪 Simulação do projeto no Wokwi:
 [Acessar projeto no Wokwi](https://wokwi.com/projects/462694220214405121)
 
+---
 
 ## 👥 Integrantes
 
