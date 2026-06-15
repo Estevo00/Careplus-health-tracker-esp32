@@ -1,0 +1,126 @@
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <PubSubClient.h>
+
+
+const char* ssid = "NOME_DA_SUA_REDE_WIFI"; 
+const char* password = "SENHA_DO_SEU_WIFI";        
+
+const char* mqttServer = "70cca3db7eef4ceba8aa878d5f61e00a.s1.eu.hivemq.cloud";
+const int mqttPort = 8883;
+const char* mqttUser = "fiap_user";
+const char* mqttPassword = "Fiap567780";
+const char* topic = "fiap/careplus/healthtracker";
+
+WiFiClientSecure espClient;
+PubSubClient client(espClient);
+
+// --- Configuração dos Pinos de Hardware ---
+const int pinoMovimento = 35; // Potenciômetro 1 conectado no D35
+const int pinoSono = 34;      // Potenciômetro 2 conectado no D34
+const int ledParcial = 27;    // LED Amarelo conectado no D27
+const int ledTotal = 26;      // LED Vermelho conectado no D26
+
+int streak = 0;
+bool metaAnteriorAtingida = false;
+
+void conectarWiFi() {
+  Serial.print("Conectando ao WiFi");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi conectado!");
+}
+
+void conectarMQTT() {
+  while (!client.connected()) {
+    Serial.print("Conectando ao HiveMQ Cloud...");
+    String clientId = "CarePlusFisico-";
+    clientId += String(random(0xffff), HEX);
+
+    if (client.connect(clientId.c_str(), mqttUser, mqttPassword)) {
+      Serial.println("Conectado com sucesso!");
+    } else {
+      Serial.print("Falha MQTT, erro: ");
+      Serial.println(client.state());
+      delay(3000);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(ledParcial, OUTPUT);
+  pinMode(ledTotal, OUTPUT);
+
+  conectarWiFi();
+  espClient.setInsecure(); // Ignora a checagem manual de certificados digitais para agilizar o TLS
+  client.setServer(mqttServer, mqttPort);
+}
+
+void loop() {
+  if (!client.connected()) {
+    conectarMQTT();
+  }
+  client.loop();
+
+  // Leitura analógica (Resolução nativa do ESP32: 0 a 4095)
+  int leituraMov = analogRead(pinoMovimento);
+  int leituraSono = analogRead(pinoSono);
+
+  // Convertendo valores brutos para a escala percentual (0 a 100%)
+  int movimento = map(leituraMov, 0, 4095, 0, 100);
+  int sono = map(leituraSono, 0, 4095, 0, 100);
+
+  bool metaMovimentoBatida = movimento >= 60;
+  bool metaSonoBatida = sono >= 70;
+
+  int pontos = 0;
+  if (metaMovimentoBatida) pontos += 10;
+  if (metaSonoBatida) pontos += 10;
+
+  String status = "precisa_incentivo";
+  if (pontos == 20) {
+    status = "meta_atingida";
+  } else if (pontos == 10) {
+    status = "progresso_parcial";
+  }
+
+  // Controle visual dos LEDs físicos na protoboard
+  if (status == "meta_atingida") {
+    digitalWrite(ledTotal, HIGH);   // Acende o vermelho (Meta Total Batida)
+    digitalWrite(ledParcial, LOW);  // Apaga o amarelo
+    if (!metaAnteriorAtingida) {
+      streak++;
+      metaAnteriorAtingida = true;
+    }
+  } 
+  else if (status == "progresso_parcial") {
+    digitalWrite(ledTotal, LOW);    // Apaga o vermelho
+    digitalWrite(ledParcial, HIGH); // Acende o amarelo (Metade do objetivo concluído)
+    metaAnteriorAtingida = false;
+  } 
+  else {
+    digitalWrite(ledTotal, LOW);    // Apaga todos se o usuário estiver ocioso
+    digitalWrite(ledParcial, LOW);
+    metaAnteriorAtingida = false;
+  }
+
+  // Estruturação do payload em formato JSON estrito para o interpretador do Node-RED
+  String payload = "{";
+  payload += "\"device\":\"careplus_tracker_fisico_real\",";
+  payload += "\"movimento\":" + String(movimento) + ",";
+  payload += "\"sono\":" + String(sono) + ",";
+  payload += "\"hidratacao\":0,"; 
+  payload += "\"pontos\":" + String(pontos) + ",";
+  payload += "\"status\":\"" + status + "\",";
+  payload += "\"streak\":" + String(streak);
+  payload += "}";
+
+  Serial.println(payload);
+  client.publish(topic, payload.c_str());
+
+  delay(5000); // Janela de transmissão cíclica de telemetria (5 segundos)
+}
