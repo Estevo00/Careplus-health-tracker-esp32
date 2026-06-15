@@ -197,6 +197,49 @@ Mesmo sendo uma simulação, o sistema demonstra conceitos importantes como:
 🧪 Simulação do projeto no Wokwi:
 [Acessar projeto no Wokwi](https://wokwi.com/projects/462694220214405121)
 
+# CarePlus Health Tracker (ESP32 Físico)
+
+Este repositório contém a documentação técnica, códigos e scripts do ecossistema **Health Tracker** desenvolvido para a **Care Plus**. O projeto consiste em uma solução de Internet das Coisas (IoT) integrada de ponta a ponta, coletando dados críticos de bem-estar a partir de um dispositivo físico de borda e disponibilizando os dados em tempo real em um painel gerencial executivo.
+
+---
+
+## 🎬 Demonstração do Projeto
+Assista à validação em runtime de todo o ecossistema integrado (Hardware Real, MQTT Cloud e Dashboard):
+👉 **[Assista no YouTube](https://youtu.be/rdVtUcSX1VU)**
+
+---
+
+## 🏗️ Arquitetura do Sistema
+O ecossistema segue a arquitetura clássica e enxuta de soluções corporativas de IoT, dividida em três camadas:
+
+1. **Camada Edge (Borda):** O microcontrolador **ESP32** realiza a leitura analógica dos sinais dos sensores na protoboard física. Os sinais são digitalizados, normalizados para uma escala percentual estável (0 a 100) e encapsulados em uma estrutura de dados padronizada em formato **JSON**.
+2. **Camada de Transporte (Nuvem):** Utilização do protocolo **MQTT** para comunicação assíncrona orientada a tópicos. Os dados são transmitidos com **Criptografia TLS (Transport Layer Security)** ativa através da porta segura **8883** para o broker em nuvem **HiveMQ Cloud**.
+3. **Camada de Aplicação (Tratamento e UI):** O **Node-RED** atua como o motor de processamento local. Ele subscreve o tópico na nuvem, realiza o *parsing* do objeto JSON recebido e injeta as variáveis dinamicamente no **Node-RED Dashboard** para monitoramento em tempo real.
+
+---
+
+## 🎛️ Componentes Utilizados (Hardware)
+* **1 ESP32** (NodeMCU)
+* **2 Potenciômetros** de precisão (Simulando a telemetria analógica dos sensores de saúde)
+* **1 Protoboard** e cabos jumpers de conexão
+
+---
+
+## ⚙️ Funcionamento do Sistema & Interpretação de Dados
+
+### Entrada de Dados (Payload JSON)
+O dispositivo físico de borda realiza as leituras estruturadas e envia periodicamente o pacote JSON abaixo para o tópico `fiap/careplus/healthtracker`:
+
+```json
+{
+  "device": "careplus_tracker_fisico_real",
+  "movimento": 79,
+  "sono": 100,
+  "hidratacao": 0,
+  "pontos": 20
+}
+
+
 ## 👥 Integrantes
 
 - Cauã Pereira da Silva — RM568143
