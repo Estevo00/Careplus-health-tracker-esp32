@@ -201,6 +201,7 @@ O dispositivo físico de borda realiza as leituras estruturadas e envia periodic
   "hidratacao": 0,
   "pontos": 20
 }
+```
 ---
 
 ## 🎯 Objetivo do projeto
