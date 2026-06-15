@@ -1,6 +1,5 @@
----
 
-## 📖 Manual de Operações (Guia de Execução)
+# 📖 Manual de Operações (Guia de Execução)
 
 Para reproduzir e testar o ecossistema completo do Health Tracker localmente, siga os passos abaixo:
 
@@ -10,19 +9,21 @@ Para reproduzir e testar o ecossistema completo do Health Tracker localmente, si
 3. Insira as credenciais da sua rede local sem fio (`ssid` e `password`) e as credenciais de autenticação do seu cluster HiveMQ Cloud.
 4. Realize o upload do firmware para a placa **ESP32**. Abra o Monitor Serial (115200 bps) para monitorar o status de conexão IP e o envio cíclico dos payloads JSON.
 
+
 ### 2. Inicialização do Servidor de Aplicação
 1. Abra o Prompt de Comando (CMD) do seu sistema operacional.
 2. Inicialize o servidor local do Node-RED executando o comando:
    ```bash
    node-red
    ```
-
 3. Mantenha a janela do terminal aberta em segundo plano para garantir a execução contínua do runtime.
+
 
 ### 3. Importação do Fluxo Lógico no Node-RED
 1. Abra o navegador e acesse a IDE de desenvolvimento pelo endereço local: `http://127.0.0.1:1880`.
 2. No menu superior direito (três linhas horizontais), vá em **Importar** -> **Selecionar Arquivo** e carregue o arquivo `.json` do fluxo disponibilizado neste repositório.
 3. Clique no botão vermelho **Implementar (Deploy)** no canto superior direito para registrar a lógica dos nós de telemetria.
+
 
 ### 4. Visualização das Métricas no Dashboard
 1. Para visualizar a interface executiva em pleno funcionamento, abra uma nova aba do navegador e acesse a URL:
